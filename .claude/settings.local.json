@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm dev)",
+      "Bash(timeout /t 10)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
