@@ -67,7 +67,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                   setOpenMobile(false);
                 }}
               >
-                <span className="cursor-pointer rounded-md px-2 font-semibold text-lg hover:bg-muted">
+                <span className=" rounded-md px-2 font-semibold text-lg">
                   Chatbot
                 </span>
               </Link>
@@ -76,7 +76,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
-                        className="h-8 p-1 md:h-fit md:p-2"
+                        className="size-8 md:size-10 bg-transparent hover:bg-sidebar-primary active:bg-sidebar-ring rounded-lg transition-colors p-0 text-sidebar-foreground hover:text-sidebar-foreground active:text-sidebar-foreground cursor-pointer"
                         onClick={() => setShowDeleteAllDialog(true)}
                         type="button"
                         variant="ghost"
@@ -92,7 +92,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      className="h-8 p-1 md:h-fit md:p-2"
+                      className="size-8 md:size-10 bg-transparent hover:bg-sidebar-primary active:bg-sidebar-ring rounded-lg transition-colors p-0 text-sidebar-foreground hover:text-sidebar-foreground active:text-sidebar-foreground cursor-pointer"
                       onClick={() => {
                         setOpenMobile(false);
                         router.push("/");

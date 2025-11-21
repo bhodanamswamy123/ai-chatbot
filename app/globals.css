@@ -15,41 +15,41 @@
 
 /* define design tokens (light mode) */
 :root {
-  --background: hsl(210 40% 98%);
-  --foreground: hsl(210 20% 30%);
-  --card: hsl(210 40% 99%);
-  --card-foreground: hsl(210 20% 35%);
-  --popover: hsl(210 40% 99%);
-  --popover-foreground: hsl(210 20% 35%);
-  --primary: hsl(210 60% 55%);
+  --background: hsl(210 20% 98%);
+  --foreground: hsl(220 15% 15%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(220 15% 15%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(220 15% 15%);
+  --primary: hsl(220 60% 18%);
   --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(210 30% 96%);
-  --secondary-foreground: hsl(210 20% 40%);
-  --muted: hsl(210 30% 97%);
-  --muted-foreground: hsl(210 15% 55%);
-  --accent: hsl(200 50% 94%);
-  --accent-foreground: hsl(210 60% 45%);
-  --destructive: hsl(0 70% 65%);
+  --secondary: hsl(220 13% 95%);
+  --secondary-foreground: hsl(220 15% 15%);
+  --muted: hsl(220 13% 95%);
+  --muted-foreground: hsl(220 10% 45%);
+  --accent: hsl(220 13% 95%);
+  --accent-foreground: hsl(220 60% 18%);
+  --destructive: hsl(0 70% 50%);
   --destructive-foreground: hsl(0 0% 100%);
-  --border: hsl(210 30% 92%);
-  --input: hsl(210 30% 94%);
-  --ring: hsl(210 60% 55%);
-  --chart-1: hsl(200 80% 70%);
-  --chart-2: hsl(160 65% 65%);
-  --chart-3: hsl(280 65% 70%);
-  --chart-4: hsl(45 85% 70%);
-  --chart-5: hsl(30 80% 68%);
-  --sidebar-background: hsl(210 35% 97%);
-  --sidebar-foreground: hsl(210 20% 40%);
-  --sidebar-primary: hsl(210 60% 55%);
+  --border: hsl(220 13% 91%);
+  --input: hsl(220 13% 91%);
+  --ring: hsl(220 60% 18%);
+  --chart-1: hsl(220 60% 18%);
+  --chart-2: hsl(160 84% 39%);
+  --chart-3: hsl(280 65% 60%);
+  --chart-4: hsl(45 85% 55%);
+  --chart-5: hsl(30 80% 55%);
+  --sidebar-background: hsl(220 60% 15%);
+  --sidebar-foreground: hsl(0 0% 100%);
+  --sidebar-primary: hsl(220 65% 25%);
   --sidebar-primary-foreground: hsl(0 0% 100%);
-  --sidebar-accent: hsl(210 30% 95%);
-  --sidebar-accent-foreground: hsl(210 60% 45%);
-  --sidebar-border: hsl(210 25% 90%);
-  --sidebar-ring: hsl(210 80% 65%);
+  --sidebar-accent: hsl(220 55% 20%);
+  --sidebar-accent-foreground: hsl(0 0% 100%);
+  --sidebar-border: hsl(220 50% 20%);
+  --sidebar-ring: hsl(220 60% 40%);
   /* border radius unit */
   --radius: 0.5rem;
-  --sidebar: hsl(210 35% 97%);
+  --sidebar: hsl(220 60% 15%);
 }
 
 /* define design tokens (dark mode) */

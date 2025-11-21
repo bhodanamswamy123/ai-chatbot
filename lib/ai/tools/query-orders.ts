@@ -6,6 +6,37 @@ const ORDER_COMMANDS_API_BASE_URL = process.env.ORDER_COMMANDS_API_BASE_URL;
 const ORDER_API_TOKEN = process.env.ORDER_API_TOKEN;
 const ORDER_ORIGIN_URL = process.env.ORDER_ORIGIN_URL;
 
+// Order status code mapping
+const ORDER_STATUS_CODES = {
+  Draft: 1,
+  AwaitingApproval: 2,
+  ApprovalRejected: 3,
+  New: 4,
+  InReview: 5,
+  Processing: 6,
+  InProgress: 7,
+  WaitingForDropshipment: 8,
+  WaitingForAcknowledgment: 9,
+  WaitingForShipment: 10,
+  PartiallyShipped: 11,
+  Shipped: 12,
+  Delivered: 13,
+  Completed: 14,
+  Canceled: 15,
+  Returned: 16,
+  PartiallyReturned: 17,
+  CancellationRequested: 18,
+} as const;
+
+// Reverse mapping for status code to name
+const STATUS_CODE_TO_NAME = Object.entries(ORDER_STATUS_CODES).reduce(
+  (acc, [name, code]) => {
+    acc[code] = name;
+    return acc;
+  },
+  {} as Record<number, string>
+);
+
 interface ApiRequestOptions {
   method?: "GET" | "POST" | "PUT" | "DELETE";
   body?: any;
@@ -181,11 +212,11 @@ export const queryOrders = tool({
 // Tool to get order details and status
 export const getOrderDetails = tool({
   description:
-    "Get detailed information and current status of a specific order by its order number or ID. This includes order items, shipping information, payment status, and order history.",
+    "Get detailed information and current status of a specific order by its order number. This includes order detail ID, items, shipping information, payment status, and order history.",
   inputSchema: z.object({
     orderNumber: z
       .string()
-      .describe("The order number or order ID to get details for"),
+      .describe("The order number to get details for (e.g., 'ORD12', 'ORD15')"),
   }),
   execute: async (input) => {
     const result = await callOrderAPI(`/Orders/${input.orderNumber}`);
@@ -200,9 +231,17 @@ export const getOrderDetails = tool({
     // Extract order details from response
     const apiResponse = result.data as any;
     if (apiResponse.isSuccess && apiResponse.response) {
+      const orderData = apiResponse.response;
       return {
-        order: apiResponse.response,
-        message: `Order details for ${input.orderNumber}`,
+        orderNumber: input.orderNumber,
+        orderDetailId: orderData.orderDetailId || orderData.id,
+        status: orderData.status || orderData.orderStatus,
+        orderDate: orderData.orderDate,
+        customer: orderData.customerName || orderData.customer,
+        total: orderData.total || orderData.orderTotal,
+        itemCount: orderData.itemCount || orderData.items?.length,
+        fullDetails: orderData,
+        message: `Order details for ${input.orderNumber} (Detail ID: ${orderData.orderDetailId || orderData.id})`,
       };
     }
 
@@ -213,52 +252,129 @@ export const getOrderDetails = tool({
 // Tool to get order status specifically
 export const getOrderStatus = tool({
   description:
-    "Get the current status of a specific order. Returns status information like 'Pending', 'Processing', 'Shipped', 'Delivered', or 'Cancelled'.",
+    "Get the current status of a specific order by order number. Returns status information and the order detail ID needed for updates.",
   inputSchema: z.object({
     orderNumber: z
       .string()
-      .describe("The order number or order ID to check status for"),
+      .describe("The order number to check status for (e.g., 'ORD12', 'ORD15')"),
   }),
   execute: async (input) => {
-    const result = await callOrderAPI(
-      `/Orders/${input.orderNumber}/Status`
-    );
+    // Get the full order details to extract status and orderDetailId
+    const result = await callOrderAPI(`/Orders/${input.orderNumber}`);
 
     if (result.error) {
-      // If status endpoint doesn't exist, try getting full details
-      const detailsResult = await callOrderAPI(
-        `/Orders/${input.orderNumber}`
-      );
-
-      if (detailsResult.error) {
-        return {
-          error: detailsResult.error,
-          message: `Could not retrieve status for order: ${input.orderNumber}`,
-        };
-      }
-
-      // Extract status from full order details
-      const apiResponse = detailsResult.data as any;
-      if (apiResponse.isSuccess && apiResponse.response) {
-        const orderData = apiResponse.response;
-        return {
-          orderNumber: input.orderNumber,
-          status: orderData.status || orderData.orderStatus,
-          orderDate: orderData.orderDate,
-          statusHistory: orderData.statusHistory || [],
-        };
-      }
-    }
-
-    // Extract status from API response
-    const apiResponse = result.data as any;
-    if (apiResponse.isSuccess && apiResponse.response) {
       return {
-        orderNumber: input.orderNumber,
-        status: apiResponse.response.status || apiResponse.response,
+        error: result.error,
+        message: `Could not retrieve status for order: ${input.orderNumber}`,
       };
     }
 
-    return result.data;
+    // Extract status from order details
+    const apiResponse = result.data as any;
+    if (apiResponse.isSuccess && apiResponse.response) {
+      const orderData = apiResponse.response;
+      return {
+        orderNumber: input.orderNumber,
+        orderDetailId: orderData.orderDetailId || orderData.id,
+        status: orderData.status || orderData.orderStatus || "Unknown",
+        statusCode: orderData.statusCode,
+        orderDate: orderData.orderDate,
+        customer: orderData.customerName || orderData.customer,
+        total: orderData.total || orderData.orderTotal,
+        itemCount: orderData.itemCount || orderData.items?.length,
+        message: `Order ${input.orderNumber} status: ${orderData.status || orderData.orderStatus} (Detail ID: ${orderData.orderDetailId || orderData.id})`,
+      };
+    }
+
+    return {
+      error: "Unexpected response format",
+      message: `Could not parse status for order: ${input.orderNumber}`,
+    };
+  },
+});
+
+// Tool to update order status
+export const updateOrderStatus = tool({
+  description:
+    "Update the status of an order using its order detail ID. You must first get the order details to obtain the orderDetailId, then use it to update the status.",
+  inputSchema: z.object({
+    orderDetailId: z
+      .string()
+      .describe("The order detail ID (obtained from getOrderStatus or getOrderDetails)"),
+    status: z
+      .string()
+      .describe(
+        "The new status name (e.g., 'Processing', 'Shipped', 'Delivered', 'Canceled', 'CancellationRequested')"
+      ),
+  }),
+  execute: async (input) => {
+    // Convert status name to status code
+    let statusCode: number | undefined;
+
+    // Check if input is a status name
+    const statusName = input.status.replace(/\s+/g, ""); // Remove spaces
+    const matchingStatus = Object.keys(ORDER_STATUS_CODES).find(
+      (key) => key.toLowerCase() === statusName.toLowerCase()
+    );
+
+    if (matchingStatus) {
+      statusCode =
+        ORDER_STATUS_CODES[matchingStatus as keyof typeof ORDER_STATUS_CODES];
+    } else {
+      // Try parsing as a number
+      const parsedCode = parseInt(input.status);
+      if (!isNaN(parsedCode) && parsedCode >= 1 && parsedCode <= 18) {
+        statusCode = parsedCode;
+      }
+    }
+
+    if (!statusCode) {
+      return {
+        error: `Invalid status: ${input.status}`,
+        message: `Please use one of: ${Object.keys(ORDER_STATUS_CODES).join(", ")}`,
+        availableStatuses: Object.entries(ORDER_STATUS_CODES).map(
+          ([name, code]) => ({
+            code,
+            name,
+          })
+        ),
+      };
+    }
+
+    // Call the commands API to update status using orderDetailId
+    const result = await callOrderAPI(
+      `/Orders/${input.orderDetailId}/Status`,
+      {
+        method: "PUT",
+        body: {
+          statusCode: statusCode,
+        },
+      },
+      true // Use commands API
+    );
+
+    if (result.error) {
+      return {
+        error: result.error,
+        message: `Failed to update status for order detail ID ${input.orderDetailId}. Make sure you're using the orderDetailId (not orderNumber).`,
+      };
+    }
+
+    const apiResponse = result.data as any;
+    if (apiResponse.isSuccess) {
+      return {
+        success: true,
+        orderDetailId: input.orderDetailId,
+        newStatus: STATUS_CODE_TO_NAME[statusCode],
+        statusCode: statusCode,
+        message: `Order (Detail ID: ${input.orderDetailId}) status updated to ${STATUS_CODE_TO_NAME[statusCode]} (code: ${statusCode})`,
+      };
+    }
+
+    return {
+      error: "Failed to update status",
+      message: `Could not update status for order detail ID ${input.orderDetailId}`,
+      response: apiResponse,
+    };
   },
 });
