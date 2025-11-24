@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { Package, Heart } from 'lucide-react';
+import { Package } from 'lucide-react';
 import {
   Carousel,
   CarouselContent,
@@ -99,11 +99,6 @@ export function ProductCards({
               >
             {/* Product Image with Gradient Background */}
             <div className="relative w-full h-64 bg-gradient-to-br from-purple-400/80 to-blue-400/80 flex items-center justify-center p-6">
-              {/* Heart Icon */}
-              <button className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-colors">
-                <Heart className="w-5 h-5 text-white" />
-              </button>
-
               {/* Product Image */}
               {product.imageUrl ? (
                 <img
