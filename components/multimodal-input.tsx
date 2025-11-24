@@ -154,7 +154,7 @@ function PureMultimodalInput({
     setInput("");
 
     if (width && width > 768) {
-      setTimeout(() => textareaRef.current?.focus(), 5000);
+      textareaRef.current?.focus()
     }
   }, [
     input,
