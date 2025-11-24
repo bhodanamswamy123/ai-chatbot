@@ -3,7 +3,7 @@ import { z } from "zod";
 
 const ORDER_QUERIES_API_BASE_URL = process.env.ORDER_QUERIES_API_BASE_URL;
 const ORDER_COMMANDS_API_BASE_URL = process.env.ORDER_COMMANDS_API_BASE_URL;
-const ORDER_API_TOKEN = process.env.ORDER_API_TOKEN;
+const API_TOKEN = process.env.API_TOKEN;
 const ORDER_ORIGIN_URL = process.env.ORDER_ORIGIN_URL;
 
 // Order status code mapping
@@ -52,7 +52,7 @@ async function callOrderAPI(
     ? ORDER_COMMANDS_API_BASE_URL
     : ORDER_QUERIES_API_BASE_URL;
 
-  if (!baseUrl || !ORDER_API_TOKEN) {
+  if (!baseUrl || !API_TOKEN) {
     return {
       error: "Order API configuration is missing. Please check environment variables.",
     };
@@ -70,7 +70,7 @@ async function callOrderAPI(
   }
 
   const headers: Record<string, string> = {
-    Authorization: `Bearer ${ORDER_API_TOKEN}`,
+    Authorization: `Bearer ${API_TOKEN}`,
     "Content-Type": "application/json",
     Accept: "application/json",
     "User-Agent": "AI-Chatbot/1.0",

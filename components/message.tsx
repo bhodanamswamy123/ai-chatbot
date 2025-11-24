@@ -24,6 +24,7 @@ import { MessageEditor } from "./message-editor";
 import { MessageReasoning } from "./message-reasoning";
 import { PreviewAttachment } from "./preview-attachment";
 import { Weather } from "./weather";
+import { ProductCards } from "./product-cards";
 
 const PurePreviewMessage = ({
   chatId,
@@ -109,6 +110,7 @@ const PurePreviewMessage = ({
           {message.parts?.map((part, index) => {
             const { type } = part;
             const key = `message-${message.id}-part-${index}`;
+            const typeStr = type as string;
 
             if (type === "reasoning" && part.text?.trim().length > 0) {
               return (
@@ -259,6 +261,39 @@ const PurePreviewMessage = ({
                               type="request-suggestions"
                             />
                           )
+                        }
+                      />
+                    )}
+                  </ToolContent>
+                </Tool>
+              );
+            }
+
+            if (typeStr === "tool-searchProducts") {
+              const { toolCallId, state } = part as any;
+              const partOutput = (part as any).output;
+
+              return (
+                <Tool defaultOpen={true} key={toolCallId}>
+                  <ToolHeader state={state} type="tool-searchProducts" />
+                  <ToolContent>
+                    {state === "input-available" && (
+                      <ToolInput input={(part as any).input} />
+                    )}
+                    {state === "output-available" && (
+                      <ToolOutput
+                        errorText={partOutput?.error ? String(partOutput.error) : undefined}
+                        output={
+                          partOutput && !partOutput.error ? (
+                            <ProductCards
+                              products={partOutput.products || []}
+                              totalCount={partOutput.pagination?.totalCount || 0}
+                              pageIndex={partOutput.pagination?.pageIndex || 1}
+                              pageSize={partOutput.pagination?.pageSize || 10}
+                              searchString={partOutput.searchCriteria?.searchString}
+                              sirvUrlPrefix={process.env.NEXT_PUBLIC_SIRV_URL_PREFIX}
+                            />
+                          ) : null
                         }
                       />
                     )}
