@@ -22,7 +22,7 @@ export async function middleware(request: NextRequest) {
     secret: process.env.AUTH_SECRET,
     secureCookie: !isDevelopmentEnvironment,
   });
-
+console.log("MIDDLEWARE TOKEN:", token);
   // Detect iframe embedding and allow guest mode without server redirect
   const secFetchDest = request.headers.get("sec-fetch-dest");
   const referer = request.headers.get("referer");
