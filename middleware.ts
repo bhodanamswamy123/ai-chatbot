@@ -17,11 +17,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Allow iframe embedding from allowed domains without auth redirect
+  // Detect iframe embedding and allow guest mode without server redirect
+  const secFetchDest = request.headers.get("sec-fetch-dest");
   const referer = request.headers.get("referer");
-  if (referer && (referer.includes("easyfastnow.com"))) {
-    return NextResponse.next();
-  }
+
+  // Allow if:
+  // 1. Browser indicates iframe context, OR
+  // 2. Request comes from allowed domain
+  const isIframeContext = secFetchDest === "iframe" ||
+                         (referer && referer.includes("easyfastnow.com"));
 
   const token = await getToken({
     req: request,
@@ -29,7 +33,8 @@ export async function middleware(request: NextRequest) {
     secureCookie: !isDevelopmentEnvironment,
   });
 
-  if (!token) {
+  // Skip auth redirect for iframe embeds - let client-side guest auth handle it
+  if (!token && !isIframeContext) {
     const redirectUrl = encodeURIComponent(request.url);
 
     return NextResponse.redirect(

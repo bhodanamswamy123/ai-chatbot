@@ -1,7 +1,8 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Chat } from "@/components/chat";
 import { DataStreamHandler } from "@/components/data-stream-handler";
+import { IframeGuestAuth } from "@/components/iframe-guest-auth";
 import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
 import { generateUUID } from "@/lib/utils";
 import { auth } from "../(auth)/auth";
@@ -9,7 +10,15 @@ import { auth } from "../(auth)/auth";
 export default async function Page() {
   const session = await auth();
 
-  if (!session) {
+  // Check if this is an iframe embed context
+  const headersList = await headers();
+  const secFetchDest = headersList.get("sec-fetch-dest");
+  const referer = headersList.get("referer");
+  const isIframeContext = secFetchDest === "iframe" ||
+                         (referer && referer.includes("easyfastnow.com"));
+
+  // Only redirect to guest auth if not in iframe context
+  if (!session && !isIframeContext) {
     redirect("/api/auth/guest");
   }
 
@@ -31,6 +40,7 @@ export default async function Page() {
           key={id}
         />
         <DataStreamHandler />
+        <IframeGuestAuth />
       </>
     );
   }
@@ -47,6 +57,7 @@ export default async function Page() {
         key={id}
       />
       <DataStreamHandler />
+      <IframeGuestAuth />
     </>
   );
 }
