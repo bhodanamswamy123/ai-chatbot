@@ -90,9 +90,9 @@ export function ProductCards({
           align: 'start',
           loop: true,
         }}
-        className="w-full relative"
+        className="w-full relative px-8"
       >
-        <CarouselContent className="-ml-2 md:-ml-4">
+        <CarouselContent className="-ml-2 md:-ml-4 mb-6 px-8">
           {products.map((product, index) => (
             <CarouselItem key={`${product.productCode}-${index}`} className="pl-2 md:pl-4 basis-full md:basis-1/2">
               <Card className="overflow-hidden rounded-3xl border-none shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-purple-100 to-blue-100 h-full flex flex-col"
@@ -174,20 +174,20 @@ export function ProductCards({
               </div>
 
               {/* Price Section - Note: Price not available from API */}
-              <div className="flex items-center justify-between pt-2">
+              {/* <div className="flex items-center justify-between pt-2">
                 <div>
                   <p className="text-xs text-gray-500 uppercase tracking-wide">Price</p>
                   <p className="text-sm text-gray-400 italic">Contact for pricing</p>
                 </div>
-              </div>
+              </div> */}
 
               {/* Spacer to push button to bottom */}
-              <div className="flex-1"></div>
+              {/* <div className="flex-1"></div> */}
 
               {/* View Details Button */}
-              <button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-xl font-medium hover:from-purple-700 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg">
+              {/* <button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-xl font-medium hover:from-purple-700 hover:to-blue-700 transition-all duration-200 shadow-md hover:shadow-lg">
                 View Details
-              </button>
+              </button> */}
             </CardContent>
           </Card>
         </CarouselItem>
