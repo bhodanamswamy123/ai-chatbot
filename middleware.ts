@@ -17,6 +17,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Allow iframe embedding from allowed domains without auth redirect
+  const referer = request.headers.get("referer");
+  if (referer && (referer.includes("easyfastnow.com"))) {
+    return NextResponse.next();
+  }
+
   const token = await getToken({
     req: request,
     secret: process.env.AUTH_SECRET,
