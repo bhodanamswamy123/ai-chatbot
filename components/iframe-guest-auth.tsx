@@ -17,6 +17,13 @@ export function IframeGuestAuth() {
       return;
     }
 
+    // Add iframe parameter to URL if not present
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has("iframe")) {
+      url.searchParams.set("iframe", "true");
+      window.history.replaceState({}, "", url.toString());
+    }
+
     // If loading or already has session, do nothing
     if (status === "loading" || session) {
       // Clear the flag if we successfully have a session
@@ -39,8 +46,9 @@ export function IframeGuestAuth() {
       isAuthenticating.current = true;
       sessionStorage.setItem(STORAGE_KEY, "true");
 
-      // Redirect to guest auth endpoint
-      window.location.href = "/api/auth/guest";
+      // Redirect to guest auth endpoint with iframe parameter
+      const currentUrl = new URL(window.location.href);
+      window.location.href = `/api/auth/guest?redirectUrl=${encodeURIComponent(currentUrl.toString())}`;
     }
   }, [session, status]);
 

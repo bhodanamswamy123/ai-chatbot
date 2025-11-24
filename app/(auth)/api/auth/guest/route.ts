@@ -3,7 +3,7 @@ import { getToken } from "next-auth/jwt";
 import { signIn } from "@/app/(auth)/auth";
 import { isDevelopmentEnvironment } from "@/lib/constants";
 
-export async function GET(request: Request) {
+async function handleGuestAuth(request: Request) {
   const { searchParams } = new URL(request.url);
   const redirectUrl = searchParams.get("redirectUrl") || "/";
 
@@ -18,4 +18,12 @@ export async function GET(request: Request) {
   }
 
   return signIn("guest", { redirect: true, redirectTo: redirectUrl });
+}
+
+export async function GET(request: Request) {
+  return handleGuestAuth(request);
+}
+
+export async function POST(request: Request) {
+  return handleGuestAuth(request);
 }
