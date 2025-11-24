@@ -24,6 +24,17 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Security-Policy',
             value: "frame-ancestors 'self' https://org2.easyfastnow.com https://*.easyfastnow.com"
+          },{
+            key: 'Access-Control-Allow-Origin',
+            value: '*' // Or specifically: 'https://org2.easyfastnow.com'
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, POST, PUT, DELETE, OPTIONS'
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type, Authorization, X-Requested-With'
           }
         ]
       }
