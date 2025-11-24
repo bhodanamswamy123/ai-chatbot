@@ -19,25 +19,20 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: '/:path*',
+        source: "/:path*",
         headers: [
+          // Allow org2.easyfastnow.com to embed this app in an iframe
           {
-            key: 'Content-Security-Policy',
-            value: "frame-ancestors 'self' https://org2.easyfastnow.com https://*.easyfastnow.com"
-          },{
-            key: 'Access-Control-Allow-Origin',
-            value: '*' // Or specifically: 'https://org2.easyfastnow.com'
+            key: "Content-Security-Policy",
+            value: "frame-ancestors https://org2.easyfastnow.com"
           },
-          {
-            key: 'Access-Control-Allow-Methods',
-            value: 'GET, POST, PUT, DELETE, OPTIONS'
-          },
-          {
-            key: 'Access-Control-Allow-Headers',
-            value: 'Content-Type, Authorization, X-Requested-With'
-          }
-        ]
-      }
+          // MUST NOT exist if present:
+          // {
+          //   key: "X-Frame-Options",
+          //   value: "SAMEORIGIN"
+          // },
+        ],
+      },
     ];
   },
 };
